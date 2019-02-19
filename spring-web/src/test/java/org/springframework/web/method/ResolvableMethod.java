@@ -53,7 +53,6 @@ import org.springframework.objenesis.SpringObjenesis;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.web.bind.annotation.ValueConstants;
 
 import static java.util.stream.Collectors.*;
 
@@ -131,11 +130,15 @@ public class ResolvableMethod {
 
 	private static final ParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
 
+	// Matches ValueConstants.DEFAULT_NONE (spring-web and spring-messaging)
+	private static final String DEFAULT_VALUE_NONE = "\n\t\t\n\t\t\n\uE000\uE001\uE002\n\t\t\t\t\n";
+
+
 	private final Method method;
 
 
 	private ResolvableMethod(Method method) {
-		Assert.notNull(method, "Method is required");
+		Assert.notNull(method, "'method' is required");
 		this.method = method;
 	}
 
@@ -183,7 +186,7 @@ public class ResolvableMethod {
 
 	/**
 	 * Filter on method arguments with annotation.
-	 * See {@link MvcAnnotationPredicates}.
+	 * See {@link org.springframework.web.method.MvcAnnotationPredicates}.
 	 */
 	@SafeVarargs
 	public final ArgResolver annot(Predicate<MethodParameter>... filter) {
@@ -203,6 +206,7 @@ public class ResolvableMethod {
 	public final ArgResolver annotNotPresent(Class<? extends Annotation>... annotationTypes) {
 		return new ArgResolver().annotNotPresent(annotationTypes);
 	}
+
 
 	@Override
 	public String toString() {
@@ -227,7 +231,7 @@ public class ResolvableMethod {
 	private String formatAnnotation(Annotation annotation) {
 		Map<String, Object> map = AnnotationUtils.getAnnotationAttributes(annotation);
 		map.forEach((key, value) -> {
-			if (value.equals(ValueConstants.DEFAULT_NONE)) {
+			if (value.equals(DEFAULT_VALUE_NONE)) {
 				map.put(key, "NONE");
 			}
 		});
@@ -264,10 +268,12 @@ public class ResolvableMethod {
 
 		private final List<Predicate<Method>> filters = new ArrayList<>(4);
 
+
 		private Builder(Class<?> objectClass) {
 			Assert.notNull(objectClass, "Class must not be null");
 			this.objectClass = objectClass;
 		}
+
 
 		private void addFilter(String message, Predicate<Method> filter) {
 			this.filters.add(new LabeledPredicate<>(message, filter));
@@ -283,7 +289,6 @@ public class ResolvableMethod {
 
 		/**
 		 * Filter on methods with the given parameter types.
-		 * @since 5.1
 		 */
 		public Builder<T> argTypes(Class<?>... argTypes) {
 			addFilter("argTypes=" + Arrays.toString(argTypes), method ->
@@ -294,7 +299,7 @@ public class ResolvableMethod {
 
 		/**
 		 * Filter on annotated methods.
-		 * See {@link MvcAnnotationPredicates}.
+		 * See {@link org.springframework.web.method.MvcAnnotationPredicates}.
 		 */
 		@SafeVarargs
 		public final Builder<T> annot(Predicate<Method>... filters) {
@@ -305,7 +310,7 @@ public class ResolvableMethod {
 		/**
 		 * Filter on methods annotated with the given annotation type.
 		 * @see #annot(Predicate[])
-		 * @see MvcAnnotationPredicates
+		 * See {@link org.springframework.web.method.MvcAnnotationPredicates}.
 		 */
 		@SafeVarargs
 		public final Builder<T> annotPresent(Class<? extends Annotation>... annotationTypes) {
@@ -395,6 +400,7 @@ public class ResolvableMethod {
 			return new ResolvableMethod(method);
 		}
 
+
 		// Build & resolve shortcuts...
 
 		/**
@@ -448,6 +454,7 @@ public class ResolvableMethod {
 			return returning(returnType).build().returnType();
 		}
 
+
 		@Override
 		public String toString() {
 			return "ResolvableMethod.Builder[\n" +
@@ -470,6 +477,7 @@ public class ResolvableMethod {
 		private final String label;
 
 		private final Predicate<T> delegate;
+
 
 		private LabeledPredicate(String label, Predicate<T> delegate) {
 			this.label = label;
@@ -511,6 +519,7 @@ public class ResolvableMethod {
 
 		private final List<Predicate<MethodParameter>> filters = new ArrayList<>(4);
 
+
 		@SafeVarargs
 		private ArgResolver(Predicate<MethodParameter>... filter) {
 			this.filters.addAll(Arrays.asList(filter));
@@ -518,7 +527,7 @@ public class ResolvableMethod {
 
 		/**
 		 * Filter on method arguments with annotations.
-		 * See {@link MvcAnnotationPredicates}.
+		 * See {@link org.springframework.web.method.MvcAnnotationPredicates}.
 		 */
 		@SafeVarargs
 		public final ArgResolver annot(Predicate<MethodParameter>... filters) {
@@ -530,7 +539,7 @@ public class ResolvableMethod {
 		 * Filter on method arguments that have the given annotations.
 		 * @param annotationTypes the annotation types
 		 * @see #annot(Predicate[])
-		 * @see MvcAnnotationPredicates
+		 * See {@link org.springframework.web.method.MvcAnnotationPredicates}.
 		 */
 		@SafeVarargs
 		public final ArgResolver annotPresent(Class<? extends Annotation>... annotationTypes) {
@@ -607,6 +616,7 @@ public class ResolvableMethod {
 			implements org.springframework.cglib.proxy.MethodInterceptor, MethodInterceptor {
 
 		private Method invokedMethod;
+
 
 		Method getInvokedMethod() {
 			return this.invokedMethod;
