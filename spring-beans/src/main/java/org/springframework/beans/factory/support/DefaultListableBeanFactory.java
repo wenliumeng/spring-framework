@@ -100,6 +100,14 @@ import org.springframework.util.StringUtils;
  * have a look at {@link StaticListableBeanFactory}, which manages existing
  * bean instances rather than creating new ones based on bean definitions.
  *
+ * <p color="red"><font size="5">
+ *
+ *     收拢上层接口中的方法，ListableBeanFactory，ConfigurableListableBeanFactory,
+ *     BeanFactory最基础的实现类,使用post-processor后置处理器来扩展,
+ *     实现有xmlBeanFactory
+ *
+ * <font/></p>
+ *
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @author Sam Brannen
@@ -117,6 +125,10 @@ import org.springframework.util.StringUtils;
 public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFactory
 		implements ConfigurableListableBeanFactory, BeanDefinitionRegistry, Serializable {
 
+	/**
+	 * java注入程序类
+	 * <p>动态加载java类
+	 */
 	@Nullable
 	private static Class<?> javaxInjectProviderClass;
 
@@ -132,7 +144,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	}
 
 
-	/** Map from serialized id to factory instance. */
+	/**
+	 * 序列化ID映射到工厂实例
+	 */
 	private static final Map<String, Reference<DefaultListableBeanFactory>> serializableFactories =
 			new ConcurrentHashMap<>(8);
 
@@ -151,6 +165,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	private Comparator<Object> dependencyComparator;
 
 	/** Resolver to use for checking if a bean definition is an autowire candidate. */
+	/**
+	 * 策略接口 用来决定一个bean definition是否满足做一个特定依赖的自动绑定候选项
+	 */
 	private AutowireCandidateResolver autowireCandidateResolver = new SimpleAutowireCandidateResolver();
 
 	/** Map from dependency type to corresponding autowired value. */

@@ -53,6 +53,11 @@ import org.springframework.lang.Nullable;
  * ApplicationContext, to get access to an AutowireCapableBeanFactory:
  * simply cast the passed-in BeanFactory to AutowireCapableBeanFactory.
  *
+ * <p color="red"><font size="5">
+ *
+ *     提供bean的创建，属性绑定。主要用来实现自动绑定的方法是resolveDependency
+ *
+ * <font/></p>
  * @author Juergen Hoeller
  * @since 04.12.2003
  * @see org.springframework.beans.factory.BeanFactoryAware
